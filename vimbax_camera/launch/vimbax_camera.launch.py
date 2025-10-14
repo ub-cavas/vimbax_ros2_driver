@@ -27,22 +27,50 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 
-from launch import LaunchDescription
 from launch_ros.actions import Node
+from launch import LaunchDescription
+from launch.actions import DeclareLaunchArgument
+from launch.substitutions import LaunchConfiguration
 
 
 def generate_launch_description():
     return LaunchDescription([
+        DeclareLaunchArgument(
+            'camera_id',
+            default_value='',
+            description='ID of the camera device'
+        ),
+        DeclareLaunchArgument(
+            'camera_frame_id',
+            default_value='camera_link',
+            description='Frame ID for the camera'
+        ),
+        DeclareLaunchArgument(
+            'settings_file',
+            default_value='',
+            description='Path to XML settings file to load on startup. '
+                        'The file must point to a valid file on the system.'
+        ),
+        DeclareLaunchArgument(
+            'camera_info_url',
+            default_value='',
+            description='Path to camera info file to load on startup. '
+                        'The file must point to a valid file on the system.'
+        ),
+
         Node(
             package='vimbax_camera',
-            namespace='vimbax_camera_test',
+            namespace='vimbax_camera',
             executable='vimbax_camera_node',
             name='vimbax_camera_test',
             parameters=[{
-                # "camera_id": "00:0f:31:00:0e:2f"
-                # "camera_id": "00:0F-31-00-0E-2F"
-                # "camera_id": "169.254.103.205"
-                # "camera_id": "DEV_000F31000E2F"
-            }]
+                'camera_id': LaunchConfiguration('camera_id'),
+                'camera_frame_id': LaunchConfiguration('camera_frame_id'),
+                'settings_file': LaunchConfiguration('settings_file'),
+                'camera_info_url': LaunchConfiguration('camera_info_url'),
+                'use_ros_time': True,
+                'autostream': 1,
+            }],
+            remappings=[]
         )
     ])
